@@ -1,0 +1,160 @@
+/* Reset and base styles */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    color: #333;
+}
+
+.container {
+    max-width: 800px;
+    width: 100%;
+}
+
+/* Header styles */
+header {
+    text-align: center;
+    margin-bottom: 40px;
+    color: white;
+}
+
+header h1 {
+    font-family: 'Merriweather', serif;
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.date {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    font-weight: 400;
+}
+
+/* Quote card styles */
+.quote-card {
+    background: white;
+    border-radius: 20px;
+    padding: 50px 40px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    position: relative;
+    animation: fadeIn 0.8s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.quote-icon {
+    font-size: 4rem;
+    color: #667eea;
+    opacity: 0.3;
+    position: absolute;
+    top: 20px;
+    left: 30px;
+    font-family: Georgia, serif;
+}
+
+.quote-text {
+    font-family: 'Merriweather', serif;
+    font-size: 1.5rem;
+    line-height: 1.8;
+    color: #2d3748;
+    margin-bottom: 30px;
+    font-weight: 300;
+    position: relative;
+    z-index: 1;
+}
+
+.quote-author {
+    font-size: 1.2rem;
+    color: #667eea;
+    font-weight: 600;
+    text-align: right;
+    margin-top: 20px;
+}
+
+/* Footer styles */
+footer {
+    text-align: center;
+    margin-top: 30px;
+    color: white;
+}
+
+footer p {
+    margin: 8px 0;
+    font-size: 0.95rem;
+    opacity: 0.9;
+}
+
+.powered-by {
+    font-size: 0.85rem;
+}
+
+.powered-by a {
+    color: white;
+    text-decoration: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+    transition: border-color 0.3s ease;
+}
+
+.powered-by a:hover {
+    border-bottom-color: white;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    header h1 {
+        font-size: 2rem;
+    }
+
+    .quote-card {
+        padding: 40px 30px;
+    }
+
+    .quote-text {
+        font-size: 1.25rem;
+    }
+
+    .quote-icon {
+        font-size: 3rem;
+        top: 15px;
+        left: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    header h1 {
+        font-size: 1.5rem;
+    }
+
+    .quote-card {
+        padding: 30px 20px;
+    }
+
+    .quote-text {
+        font-size: 1.1rem;
+    }
+
+    .quote-author {
+        font-size: 1rem;
+    }
+}

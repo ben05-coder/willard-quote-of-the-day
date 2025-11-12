@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Willard's Quote of the Day</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Willard's Quote of the Day</h1>
+            <p class="date">{{ quote.date }}</p>
+        </header>
+        <main>
+            <div class="quote-card">
+                <div class="quote-icon">&ldquo;</div>
+                <blockquote class="quote-text">
+                    {{ quote.text }}
+                </blockquote>
+                <div class="quote-author">
+                    &mdash; {{ quote.author }}
+                </div>
+            </div>
+        </main>
+        <footer>
+            <p>A new quote appears each day</p>
+            <p class="powered-by">Powered by <a href="https://quotable.io" target="_blank">Quotable.io</a></p>
+        </footer>
+    </div>
+</body>
+</html>
