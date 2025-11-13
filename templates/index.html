@@ -2,29 +2,115 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <title>Willard's Quote of the Day</title>
+    <link rel="manifest" href="/static/manifest.json">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <style>
-        .quote-card { transition: opacity 0.4s ease, transform 0.3s ease; }
+        :root {
+            --theme-primary: #667eea;
+            --theme-secondary: #764ba2;
+            --bg-color: #fff;
+            --text-color: #2d3748;
+            --card-bg: #fff;
+            --font-size: 1rem;
+        }
+        
+        body { background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-secondary) 100%); color: var(--text-color); }
+        .quote-card { background: var(--card-bg); transition: opacity 0.4s ease, transform 0.3s ease; }
         .quote-card:hover { transform: translateY(-5px); }
+        .quote-text { font-size: calc(var(--font-size) * 1.5); }
+        .quote-author { font-size: calc(var(--font-size) * 1.1); }
+        
+        /* Dark mode */
+        body.dark-mode { --bg-color: #1a202c; --text-color: #e2e8f0; --card-bg: #2d3748; }
+        body.dark-mode .quote-card { box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6); }
+        
+        /* Theme colors */
+        body.theme-blue { --theme-primary: #3b82f6; --theme-secondary: #1e40af; }
+        body.theme-green { --theme-primary: #10b981; --theme-secondary: #047857; }
+        body.theme-pink { --theme-primary: #ec4899; --theme-secondary: #be185d; }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .container { padding: 15px; }
+            h1 { font-size: 1.8rem; }
+            .quote-text { font-size: calc(var(--font-size) * 1.3); }
+            .button-container { flex-direction: column; gap: 10px; width: 100%; }
+            .new-quote-btn, .copy-btn { width: 100%; padding: 18px 20px; font-size: 1rem; }
+            .settings-panel { width: 90%; }
+        }
+        
+        /* Settings button & panel */
+        .settings-btn { position: fixed; top: 20px; right: 20px; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.5); color: white; width: 50px; height: 50px; border-radius: 50%; cursor: pointer; font-size: 1.5rem; backdrop-filter: blur(10px); transition: all 0.3s; z-index: 100; }
+        .settings-btn:hover { background: rgba(255,255,255,0.3); transform: rotate(90deg); }
+        .settings-panel { position: fixed; top: 80px; right: 20px; background: var(--card-bg); padding: 25px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); display: none; z-index: 100; width: 300px; }
+        .settings-panel.show { display: block; animation: slideDown 0.3s ease; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        .setting-group { margin-bottom: 20px; }
+        .setting-group h3 { color: var(--theme-primary); font-size: 1rem; margin-bottom: 10px; }
+        .theme-buttons { display: flex; gap: 10px; flex-wrap: wrap; }
+        .theme-btn { width: 40px; height: 40px; border-radius: 50%; border: 3px solid transparent; cursor: pointer; transition: all 0.2s; }
+        .theme-btn:hover { transform: scale(1.1); }
+        .theme-btn.active { border-color: var(--text-color); }
+        .theme-purple { background: linear-gradient(135deg, #667eea, #764ba2); }
+        .theme-blue { background: linear-gradient(135deg, #3b82f6, #1e40af); }
+        .theme-green { background: linear-gradient(135deg, #10b981, #047857); }
+        .theme-pink { background: linear-gradient(135deg, #ec4899, #be185d); }
+        
+        .size-buttons { display: flex; gap: 10px; }
+        .size-btn { padding: 8px 16px; border: 2px solid var(--theme-primary); background: transparent; color: var(--theme-primary); border-radius: 20px; cursor: pointer; transition: all 0.2s; }
+        .size-btn:hover { background: var(--theme-primary); color: white; }
+        .size-btn.active { background: var(--theme-primary); color: white; }
+        
+        .toggle-switch { width: 60px; height: 30px; background: #ccc; border-radius: 30px; position: relative; cursor: pointer; transition: background 0.3s; }
+        .toggle-switch.active { background: var(--theme-primary); }
+        .toggle-switch::after { content: ''; position: absolute; width: 24px; height: 24px; background: white; border-radius: 50%; top: 3px; left: 3px; transition: left 0.3s; }
+        .toggle-switch.active::after { left: 33px; }
+        
         .button-container { display: flex; gap: 15px; justify-content: center; align-items: center; margin-top: 40px; flex-wrap: wrap; }
-        .new-quote-btn, .copy-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 15px 35px; font-size: 1.1rem; font-weight: 600; border-radius: 50px; cursor: pointer; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4); transition: all 0.3s ease; font-family: 'Open Sans', sans-serif; }
+        .new-quote-btn, .copy-btn { background: linear-gradient(135deg, var(--theme-primary) 0%, var(--theme-secondary) 100%); color: white; border: none; padding: 15px 35px; font-size: 1.1rem; font-weight: 600; border-radius: 50px; cursor: pointer; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4); transition: all 0.3s ease; }
         .new-quote-btn:hover, .copy-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6); }
-        .new-quote-btn:active, .copy-btn:active { transform: translateY(-1px); }
-        .new-quote-btn:disabled, .copy-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-        .copy-btn { background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); padding: 15px 30px; }
-        .copy-btn:hover { box-shadow: 0 15px 40px rgba(72, 187, 120, 0.6); }
-        .badge { display: inline-block; background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #333; padding: 8px 20px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; margin-top: 20px; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); animation: fadeIn 0.5s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .copied-msg { position: fixed; top: 20px; right: 20px; background: #48bb78; color: white; padding: 15px 25px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); animation: slideIn 0.3s ease; z-index: 1000; }
-        @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        .new-quote-btn:disabled, .copy-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .copy-btn { background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); }
+        
+        .badge { display: inline-block; background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #333; padding: 8px 20px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; margin-top: 20px; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); }
+        .copied-msg { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #48bb78; color: white; padding: 15px 25px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); z-index: 1000; }
     </style>
 </head>
 <body>
+    <button class="settings-btn" id="settings-btn">⚙️</button>
+    
+    <div class="settings-panel" id="settings-panel">
+        <div class="setting-group">
+            <h3>🎨 Color Theme</h3>
+            <div class="theme-buttons">
+                <button class="theme-btn theme-purple active" data-theme="purple"></button>
+                <button class="theme-btn theme-blue" data-theme="blue"></button>
+                <button class="theme-btn theme-green" data-theme="green"></button>
+                <button class="theme-btn theme-pink" data-theme="pink"></button>
+            </div>
+        </div>
+        <div class="setting-group">
+            <h3>🌙 Dark Mode</h3>
+            <div class="toggle-switch" id="dark-toggle"></div>
+        </div>
+        <div class="setting-group">
+            <h3>📏 Font Size</h3>
+            <div class="size-buttons">
+                <button class="size-btn" data-size="0.9">Small</button>
+                <button class="size-btn active" data-size="1">Medium</button>
+                <button class="size-btn" data-size="1.15">Large</button>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <header>
             <h1>Willard's Quote of the Day</h1>
@@ -40,26 +126,84 @@
                 {% endif %}
             </div>
             <div class="button-container">
-                <button id="new-quote-btn" class="new-quote-btn">
-                    <span id="btn-text">Get New Quote</span>
-                </button>
-                <button id="copy-btn" class="copy-btn">
-                    📋 Copy Quote
-                </button>
+                <button id="new-quote-btn" class="new-quote-btn">Get New Quote</button>
+                <button id="copy-btn" class="copy-btn">📋 Copy</button>
             </div>
         </main>
         <footer>
             <p>A new quote appears each day • <a href="/admin" class="admin-link">Add Your Own Quotes</a></p>
         </footer>
     </div>
+
     <script>
+        // Register service worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/static/sw.js');
+        }
+
         const quoteText = document.getElementById('quote-text');
         const quoteAuthor = document.getElementById('quote-author');
         const quoteCard = document.getElementById('quote-card');
         const newQuoteBtn = document.getElementById('new-quote-btn');
         const copyBtn = document.getElementById('copy-btn');
+        const settingsBtn = document.getElementById('settings-btn');
+        const settingsPanel = document.getElementById('settings-panel');
         
         let currentQuote = { text: "{{ quote.text }}", author: "{{ quote.author }}", source: "{{ quote.source }}" };
+
+        // Settings toggle
+        settingsBtn.addEventListener('click', () => {
+            settingsPanel.classList.toggle('show');
+        });
+        
+        document.addEventListener('click', (e) => {
+            if (!settingsPanel.contains(e.target) && e.target !== settingsBtn) {
+                settingsPanel.classList.remove('show');
+            }
+        });
+
+        // Load saved settings
+        const savedTheme = localStorage.getItem('theme') || 'purple';
+        const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+        const savedFontSize = localStorage.getItem('fontSize') || '1';
+        
+        document.body.className = `theme-${savedTheme}`;
+        if (savedDarkMode) document.body.classList.add('dark-mode');
+        document.documentElement.style.setProperty('--font-size', savedFontSize + 'rem');
+        
+        document.querySelector(`[data-theme="${savedTheme}"]`)?.classList.add('active');
+        document.querySelector(`[data-size="${savedFontSize}"]`)?.classList.add('active');
+        if (savedDarkMode) document.getElementById('dark-toggle').classList.add('active');
+
+        // Theme buttons
+        document.querySelectorAll('.theme-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const theme = btn.dataset.theme;
+                document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                document.body.className = `theme-${theme}`;
+                if (savedDarkMode) document.body.classList.add('dark-mode');
+                localStorage.setItem('theme', theme);
+            });
+        });
+
+        // Dark mode toggle
+        document.getElementById('dark-toggle').addEventListener('click', function() {
+            this.classList.toggle('active');
+            document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        });
+
+        // Font size buttons
+        document.querySelectorAll('.size-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const size = btn.dataset.size;
+                document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                document.documentElement.style.setProperty('--font-size', size + 'rem');
+                localStorage.setItem('fontSize', size);
+            });
+        });
 
         // New Quote Button
         newQuoteBtn.addEventListener('click', async () => {
@@ -75,7 +219,6 @@
                     quoteText.textContent = data.text;
                     quoteAuthor.textContent = `— ${data.author}`;
                     
-                    // Update badge
                     let badge = document.getElementById('badge');
                     if (data.source === 'custom') {
                         if (!badge) {
@@ -103,16 +246,13 @@
             const textToCopy = `"${currentQuote.text}" — ${currentQuote.author}`;
             try {
                 await navigator.clipboard.writeText(textToCopy);
-                
-                // Show success message
                 const msg = document.createElement('div');
                 msg.className = 'copied-msg';
-                msg.textContent = '✓ Copied to clipboard!';
+                msg.textContent = '✓ Copied!';
                 document.body.appendChild(msg);
-                
                 setTimeout(() => msg.remove(), 2000);
             } catch (err) {
-                alert('Failed to copy. Please try manually selecting the text.');
+                alert('Failed to copy.');
             }
         });
     </script>

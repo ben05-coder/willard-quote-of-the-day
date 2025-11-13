@@ -1,0 +1,18 @@
+{
+  "name": "Willard's Quote of the Day",
+  "short_name": "Willard Quotes",
+  "description": "Daily motivational quotes to inspire you",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#667eea",
+  "theme_color": "#667eea",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect fill='%23667eea' width='100' height='100'/%3E%3Ctext y='70' x='50' text-anchor='middle' font-size='60' fill='white'%3E💭%3C/text%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
