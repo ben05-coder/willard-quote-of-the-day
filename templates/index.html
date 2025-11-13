@@ -13,23 +13,47 @@
     <div class="container">
         <header>
             <h1>Willard's Quote of the Day</h1>
-            <p class="date">{{ quote.date }}</p>
+            <p class="date" id="quote-date">{{ quote.date }}</p>
         </header>
         <main>
-            <div class="quote-card">
+            <div class="quote-card" id="quote-card">
                 <div class="quote-icon">&ldquo;</div>
-                <blockquote class="quote-text">
-                    {{ quote.text }}
-                </blockquote>
-                <div class="quote-author">
-                    &mdash; {{ quote.author }}
-                </div>
+                <blockquote class="quote-text" id="quote-text">{{ quote.text }}</blockquote>
+                <div class="quote-author" id="quote-author">&mdash; {{ quote.author }}</div>
+            </div>
+            <div class="button-container">
+                <button id="new-quote-btn" class="new-quote-btn">
+                    <span id="btn-text">Get New Quote</span>
+                </button>
             </div>
         </main>
         <footer>
-            <p>A new quote appears each day</p>
-            <p class="powered-by">Powered by <a href="https://quotable.io" target="_blank">Quotable.io</a></p>
+            <p>A new quote appears each day • <a href="/admin" class="admin-link">Add Your Own Quotes</a></p>
         </footer>
     </div>
+    <script>
+        const quoteText = document.getElementById('quote-text');
+        const quoteAuthor = document.getElementById('quote-author');
+        const quoteCard = document.getElementById('quote-card');
+        const newQuoteBtn = document.getElementById('new-quote-btn');
+        newQuoteBtn.addEventListener('click', async () => {
+            try {
+                newQuoteBtn.disabled = true;
+                const response = await fetch('/api/random-quote');
+                if (!response.ok) throw new Error('Failed to fetch quote');
+                const data = await response.json();
+                quoteCard.style.opacity = '0';
+                setTimeout(() => {
+                    quoteText.textContent = data.text;
+                    quoteAuthor.textContent = `— ${data.author}`;
+                    quoteCard.style.opacity = '1';
+                }, 300);
+            } catch (error) {
+                alert('Failed to load quote. Try again!');
+            } finally {
+                newQuoteBtn.disabled = false;
+            }
+        });
+    </script>
 </body>
 </html>
