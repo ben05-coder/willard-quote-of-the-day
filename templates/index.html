@@ -8,6 +8,21 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@300;400;700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        .quote-card { transition: opacity 0.4s ease, transform 0.3s ease; }
+        .quote-card:hover { transform: translateY(-5px); }
+        .button-container { display: flex; gap: 15px; justify-content: center; align-items: center; margin-top: 40px; flex-wrap: wrap; }
+        .new-quote-btn, .copy-btn { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 15px 35px; font-size: 1.1rem; font-weight: 600; border-radius: 50px; cursor: pointer; box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4); transition: all 0.3s ease; font-family: 'Open Sans', sans-serif; }
+        .new-quote-btn:hover, .copy-btn:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6); }
+        .new-quote-btn:active, .copy-btn:active { transform: translateY(-1px); }
+        .new-quote-btn:disabled, .copy-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .copy-btn { background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); padding: 15px 30px; }
+        .copy-btn:hover { box-shadow: 0 15px 40px rgba(72, 187, 120, 0.6); }
+        .badge { display: inline-block; background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%); color: #333; padding: 8px 20px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; margin-top: 20px; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); animation: fadeIn 0.5s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .copied-msg { position: fixed; top: 20px; right: 20px; background: #48bb78; color: white; padding: 15px 25px; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); animation: slideIn 0.3s ease; z-index: 1000; }
+        @keyframes slideIn { from { transform: translateX(400px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -20,10 +35,16 @@
                 <div class="quote-icon">&ldquo;</div>
                 <blockquote class="quote-text" id="quote-text">{{ quote.text }}</blockquote>
                 <div class="quote-author" id="quote-author">&mdash; {{ quote.author }}</div>
+                {% if quote.source == 'custom' %}
+                <div class="badge" id="badge">✨ Willard's Collection</div>
+                {% endif %}
             </div>
             <div class="button-container">
                 <button id="new-quote-btn" class="new-quote-btn">
                     <span id="btn-text">Get New Quote</span>
+                </button>
+                <button id="copy-btn" class="copy-btn">
+                    📋 Copy Quote
                 </button>
             </div>
         </main>
@@ -36,22 +57,62 @@
         const quoteAuthor = document.getElementById('quote-author');
         const quoteCard = document.getElementById('quote-card');
         const newQuoteBtn = document.getElementById('new-quote-btn');
+        const copyBtn = document.getElementById('copy-btn');
+        
+        let currentQuote = { text: "{{ quote.text }}", author: "{{ quote.author }}", source: "{{ quote.source }}" };
+
+        // New Quote Button
         newQuoteBtn.addEventListener('click', async () => {
             try {
                 newQuoteBtn.disabled = true;
                 const response = await fetch('/api/random-quote');
-                if (!response.ok) throw new Error('Failed to fetch quote');
+                if (!response.ok) throw new Error('Failed');
                 const data = await response.json();
+                currentQuote = data;
+                
                 quoteCard.style.opacity = '0';
                 setTimeout(() => {
                     quoteText.textContent = data.text;
                     quoteAuthor.textContent = `— ${data.author}`;
+                    
+                    // Update badge
+                    let badge = document.getElementById('badge');
+                    if (data.source === 'custom') {
+                        if (!badge) {
+                            badge = document.createElement('div');
+                            badge.id = 'badge';
+                            badge.className = 'badge';
+                            badge.textContent = '✨ Willard\'s Collection';
+                            quoteCard.appendChild(badge);
+                        }
+                    } else if (badge) {
+                        badge.remove();
+                    }
+                    
                     quoteCard.style.opacity = '1';
-                }, 300);
+                }, 400);
             } catch (error) {
-                alert('Failed to load quote. Try again!');
+                alert('Failed to load quote!');
             } finally {
                 newQuoteBtn.disabled = false;
+            }
+        });
+
+        // Copy Button
+        copyBtn.addEventListener('click', async () => {
+            const textToCopy = `"${currentQuote.text}" — ${currentQuote.author}`;
+            try {
+                await navigator.clipboard.writeText(textToCopy);
+                
+                // Show success message
+                const msg = document.createElement('div');
+                msg.className = 'copied-msg';
+                msg.textContent = '✓ Copied to clipboard!';
+                document.body.appendChild(msg);
+                
+                setTimeout(() => msg.remove(), 2000);
+            } catch (err) {
+                alert('Failed to copy. Please try manually selecting the text.');
             }
         });
     </script>
