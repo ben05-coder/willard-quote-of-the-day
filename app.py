@@ -24,13 +24,36 @@ class CustomQuote(db.Model):
 _db_initialized = False
 
 def init_db():
+    """Initialize database with hardcoded quotes"""
     global _db_initialized
     if not _db_initialized:
         with app.app_context():
             db.create_all()
             if CustomQuote.query.count() == 0:
-                db.session.add(CustomQuote(text="Every day is a new opportunity to make a positive impact.", author="Willard"))
-                db.session.add(CustomQuote(text="Believe in yourself and amazing things will happen.", author="Willard"))
+                starter_quotes = [
+                    CustomQuote(text="Most people are eager to connect with you if you just show first that you want that too.", author="Ben"),
+                    CustomQuote(text="AMTC?", author="everyone"),
+                    CustomQuote(text="CMT isn't here today...", author="Randall"),
+                    CustomQuote(text="Arggghhh. Cake pick up. Building legos. 3 day MC.", author="Rick"),
+                    CustomQuote(text="MT isn't here todayyyy!!", author="Rick"),
+                    CustomQuote(text="I only wish I could get fired. But I can't.", author="Ben"),
+                    CustomQuote(text="I am in excruciating pain.", author="Rudy"),
+                    CustomQuote(text="Vibes!", author="Andy"),
+                    CustomQuote(text="Don't try to bastad me, ah!", author="Dric"),
+                    CustomQuote(text="These guys are all so clapped!", author="Nic"),
+                    CustomQuote(text="Ciao!", author="Edi"),
+                    CustomQuote(text="Lol! Lol! Lol!", author="Edi"),
+                    CustomQuote(text="So you just want to lie and deceive.", author="Dric"),
+                    CustomQuote(text="Boss finding you! I so stressed!", author="WJ"),
+                    CustomQuote(text="[Arriving at NSC at 10+] What's up, guys!", author="Willy"),
+                    CustomQuote(text="None of this matters anyway! Come on, man!", author="Willy"),
+                    CustomQuote(text="Don't worry, it's just army!", author="Willy"),
+                    CustomQuote(text="I'm here for a good time, not a long time.", author="Dric"),
+                    CustomQuote(text="Man, f this Janet!", author="Rudy"),
+                    CustomQuote(text="Good boy.", author="Nic"),
+                ]
+                for quote in starter_quotes:
+                    db.session.add(quote)
                 db.session.commit()
         _db_initialized = True
 
