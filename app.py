@@ -72,7 +72,7 @@ def get_api_quote():
 def get_random_quote():
     init_db()
     custom_quotes = CustomQuote.query.all()
-    if custom_quotes and random.random() < 0.5:
+    if custom_quotes and random.random() < 0.2:
         return random.choice(custom_quotes).to_dict()
     api_quote = get_api_quote()
     if api_quote:
